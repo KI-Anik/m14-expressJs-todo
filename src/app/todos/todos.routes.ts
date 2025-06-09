@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from 'express'
 import fs from 'fs'
 import path from 'path'
+import { client } from '../../config/mongodb'
 
 const filename = path.join(__dirname, '../../../db/todo.json')
 const app: Application = express()
@@ -23,10 +24,16 @@ todosRouter.get('/:titile', (req: Request, res: Response) => {
     })
 });
 
-todosRouter.post('/create', (req: Request, res: Response) => {
-    const { title, body } = req.body
-
-    res.send('new post created')
+todosRouter.post('/create', async (req: Request, res: Response) => {
+    const dbCollection = await client.db('L2-todosDB').collection('todos')
+    const newPost = await dbCollection.insertOne({
+        title : 'mongodb',
+        description : 'hey there, i am learning mongoDB',
+        priority: 'medium',
+        isCompleted : true
+    })
+   console.log('new post created')
+    res.json(newPost)
 })
 
 todosRouter.put('/update/:title', (req: Request, res: Response) => {
