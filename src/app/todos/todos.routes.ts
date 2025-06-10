@@ -2,8 +2,8 @@ import express, { Application, Request, Response } from 'express'
 import fs from 'fs'
 import path from 'path'
 import { client } from '../../config/mongodb'
+import { ObjectId } from 'mongodb'
 
-const filename = path.join(__dirname, '../../../db/todo.json')
 const app: Application = express()
 app.use(express.json())
 
@@ -11,26 +11,30 @@ export const todosRouter = express.Router()
 
 todosRouter.get('/', async (req: Request, res: Response) => {
     const dbCollection = client.db('L2-todosDB').collection('todos')
-    const cursor = await dbCollection.find().toArray()
-    res.json(cursor)
+    const result = await dbCollection.find({}).toArray()
+    res.json(result)
 })
 
-todosRouter.get('/:titile', (req: Request, res: Response) => {
-    const params = req.params
-    console.log(params)
+todosRouter.get('/:id', async (req: Request, res: Response) => {
+    const dbCollection = client.db('L2-todosDB').collection('todos')
+    const id = req.params.id
 
-    const data = fs.readFileSync(filename, 'utf-8')
-    res.send({
-        message: 'hello from params section',
-        data
-    })
+    const query = { _id: new ObjectId(id) }
+    const result = await dbCollection.findOne(query)
+    res.json(result)
+
+    // const data = fs.readFileSync(filename, 'utf-8')
+    // res.send({
+    //     message: 'hello from params section',
+    //     data
+    // })
 });
 
 todosRouter.post('/create', async (req: Request, res: Response) => {
+    const dbCollection = client.db('L2-todosDB').collection('todos')
     const { title, description, priority } = req.body;
 
-    const dbCollection = client.db('L2-todosDB').collection('todos')
-    const newPost = await dbCollection.insertOne({
+    await dbCollection.insertOne({
         title: title,
         description: description,
         priority: priority,
@@ -41,12 +45,28 @@ todosRouter.post('/create', async (req: Request, res: Response) => {
     res.json(cursor)
 })
 
-todosRouter.put('/update/:title', (req: Request, res: Response) => {
+todosRouter.put('/update/:id', async (req: Request, res: Response) => {
+    const dbCollection = client.db('L2-todosDB').collection('todos')
+    const id = req.params.id
+    const query = { _id: new ObjectId(id) }
 
+    const { title, description, priority, isCompleted } = req.body
+    const updateTodo = await dbCollection.updateOne(
+        query,
+        { $set: { title, description, priority, isCompleted } },
+        { upsert: true }
+    )
+
+    res.send(updateTodo)
 })
 
-todosRouter.delete('/delete/:titile', (req: Request, res: Response) => {
+todosRouter.delete('/delete/:id', async (req: Request, res: Response) => {
+    const dbCollection = client.db('L2-todosDB').collection('todos')
+    const id = req.params.id;
 
+    const query = { _id: new ObjectId(id) }
+    const result = await dbCollection.deleteOne(query)
+    res.json(result)
 })
 
 // 
