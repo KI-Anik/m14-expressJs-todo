@@ -7,10 +7,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express")); //esm module
 const path_1 = __importDefault(require("path"));
 const todos_routes_1 = require("./app/todos/todos.routes");
-const cors_1 = __importDefault(require("cors"));
+// import cors from 'cors';
 const filename = path_1.default.join(__dirname, '../db/todo.json');
 const app = (0, express_1.default)();
-app.use((0, cors_1.default)());
+// app.use(cors());
 app.use(express_1.default.json());
 const userRouter = express_1.default.Router();
 app.use('/todos', todos_routes_1.todosRouter);

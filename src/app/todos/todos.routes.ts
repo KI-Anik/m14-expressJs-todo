@@ -9,8 +9,10 @@ app.use(express.json())
 
 export const todosRouter = express.Router()
 
-todosRouter.get('/', (req: Request, res: Response) => {
-    res.send('welcome to todosRouter')
+todosRouter.get('/', async (req: Request, res: Response) => {
+    const dbCollection = client.db('L2-todosDB').collection('todos')
+    const cursor = await dbCollection.find().toArray()
+    res.json(cursor)
 })
 
 todosRouter.get('/:titile', (req: Request, res: Response) => {
@@ -25,15 +27,18 @@ todosRouter.get('/:titile', (req: Request, res: Response) => {
 });
 
 todosRouter.post('/create', async (req: Request, res: Response) => {
-    const dbCollection = await client.db('L2-todosDB').collection('todos')
+    const { title, description, priority } = req.body;
+
+    const dbCollection = client.db('L2-todosDB').collection('todos')
     const newPost = await dbCollection.insertOne({
-        title : 'mongodb',
-        description : 'hey there, i am learning mongoDB',
-        priority: 'medium',
-        isCompleted : true
+        title: title,
+        description: description,
+        priority: priority,
+        isCompleted: false
     })
-   console.log('new post created')
-    res.json(newPost)
+
+    const cursor = await dbCollection.find({}).toArray()
+    res.json(cursor)
 })
 
 todosRouter.put('/update/:title', (req: Request, res: Response) => {

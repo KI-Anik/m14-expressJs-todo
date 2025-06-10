@@ -21,9 +21,11 @@ const filename = path_1.default.join(__dirname, '../../../db/todo.json');
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 exports.todosRouter = express_1.default.Router();
-exports.todosRouter.get('/', (req, res) => {
-    res.send('welcome to todosRouter');
-});
+exports.todosRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const dbCollection = mongodb_1.client.db('L2-todosDB').collection('todos');
+    const cursor = yield dbCollection.find().toArray();
+    res.json(cursor);
+}));
 exports.todosRouter.get('/:titile', (req, res) => {
     const params = req.params;
     console.log(params);
@@ -34,15 +36,16 @@ exports.todosRouter.get('/:titile', (req, res) => {
     });
 });
 exports.todosRouter.post('/create', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const dbCollection = yield mongodb_1.client.db('L2-todosDB').collection('todos');
+    const { title, description, priority } = req.body;
+    const dbCollection = mongodb_1.client.db('L2-todosDB').collection('todos');
     const newPost = yield dbCollection.insertOne({
-        title: 'mongodb',
-        description: 'hey there, i am learning mongoDB',
-        priority: 'medium',
-        isCompleted: true
+        title: title,
+        description: description,
+        priority: priority,
+        isCompleted: false
     });
-    console.log('new post created');
-    res.json(newPost);
+    const cursor = yield dbCollection.find({}).toArray();
+    res.json(cursor);
 }));
 exports.todosRouter.put('/update/:title', (req, res) => {
 });
