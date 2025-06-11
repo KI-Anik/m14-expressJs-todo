@@ -19,11 +19,13 @@ const mongodb_2 = require("mongodb");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 exports.todosRouter = express_1.default.Router();
+// get all data
 exports.todosRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const dbCollection = mongodb_1.client.db('L2-todosDB').collection('todos');
     const result = yield dbCollection.find({}).toArray();
     res.json(result);
 }));
+// get specific data
 exports.todosRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const dbCollection = mongodb_1.client.db('L2-todosDB').collection('todos');
     const id = req.params.id;
@@ -45,8 +47,8 @@ exports.todosRouter.post('/create', (req, res) => __awaiter(void 0, void 0, void
         priority: priority,
         isCompleted: false
     });
-    const cursor = yield dbCollection.find({}).toArray();
-    res.json(cursor);
+    const result = yield dbCollection.find({}).toArray();
+    res.json(result);
 }));
 exports.todosRouter.put('/update/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const dbCollection = mongodb_1.client.db('L2-todosDB').collection('todos');

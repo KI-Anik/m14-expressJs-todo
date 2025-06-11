@@ -1,6 +1,4 @@
 import express, { Application, Request, Response } from 'express'
-import fs from 'fs'
-import path from 'path'
 import { client } from '../../config/mongodb'
 import { ObjectId } from 'mongodb'
 
@@ -9,12 +7,14 @@ app.use(express.json())
 
 export const todosRouter = express.Router()
 
+// get all data
 todosRouter.get('/', async (req: Request, res: Response) => {
     const dbCollection = client.db('L2-todosDB').collection('todos')
     const result = await dbCollection.find({}).toArray()
     res.json(result)
 })
 
+// get specific data
 todosRouter.get('/:id', async (req: Request, res: Response) => {
     const dbCollection = client.db('L2-todosDB').collection('todos')
     const id = req.params.id
@@ -41,8 +41,8 @@ todosRouter.post('/create', async (req: Request, res: Response) => {
         isCompleted: false
     })
 
-    const cursor = await dbCollection.find({}).toArray()
-    res.json(cursor)
+    const result = await dbCollection.find({}).toArray()
+    res.json(result)
 })
 
 todosRouter.put('/update/:id', async (req: Request, res: Response) => {

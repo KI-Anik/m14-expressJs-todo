@@ -1,6 +1,6 @@
 // const express = require('express')
 
-import express, { Application, Request, Response } from 'express' //esm module
+import express, { Application, NextFunction, Request, Response } from 'express' //esm module
 import path from 'path'
 import { todosRouter } from './app/todos/todos.routes';
 // import cors from 'cors';
@@ -16,10 +16,37 @@ app.use('/users', userRouter)
 
 
 
-app.get('/', (req: Request, res: Response) => {
-    res.send('Welcome todos app')
+app.get('/', (req: Request, res: Response, next: NextFunction) => {
+    try {
+        console.log(something)
+        res.send('Welcome todos app')
+    } catch (error) {
+        next(error)
+    }
 })
 
+app.get('/error', async (req, res, next) => {
+    try {
+        console.log('from error router', something)
+        res.send('from error router')
+    } catch (error) {
+        console.log('error', error)
+        res.status(400).json({ message: 'something went wrong' })
+    }
+})
+
+// missing route handler
+app.use((req : Request, res : Response, next : NextFunction)=>{
+    res.status(404).json({message : 'route not found'})
+})
+
+// global error handler
+app.use((error : any, req : Request ,res : Response , next : NextFunction)=>{
+    if(error){
+        console.log('error from global', error)
+        res.status(400).json({message : 'global error handler'})
+    } 
+})
 
 
 export default app
